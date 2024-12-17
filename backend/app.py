@@ -7,6 +7,7 @@ import csv
 import json
 import os
 from datetime import datetime 
+import psycopg2
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -20,36 +21,72 @@ PRODUCT_ID = 0x7009
 printer = Usb(VENDOR_ID, PRODUCT_ID)
 
 COIN_SENSOR_PIN = 3  # GPIO pin connected to the coin acceptor
-ENABLE_PIN = 5
+ENABLE_PIN = 7
 
 coin_count = 0  # Total value of coins inserted
 pulse_count = 0  # To count pulses for determining coin type
 last_pulse_time = time.time()  # Tracks the time of the last pulse
 
-# Load vouchers from CSV file
+# Database connection settings
+DATABASE_HOST = '192.168.1.2'
+DATABASE_NAME = 'qbyfidb'
+DATABASE_USER = 'qbyfiuser'
+DATABASE_PASSWORD = 'Alyssa7719!!'
+
+# Establish a connection to the PostgreSQL database
+def get_db_connection():
+    conn = psycopg2.connect(
+        host=DATABASE_HOST,
+        dbname=DATABASE_NAME,
+        user=DATABASE_USER,
+        password=DATABASE_PASSWORD
+    )
+    return conn
+
+# Load vouchers from the database
 def load_vouchers():
     vouchers = {}
     try:
-        with open("vouchers.csv", mode='r', newline='') as file:
-            csv_reader = csv.reader(file)
-            for row in csv_reader:
-                amount = int(row[0])
-                voucher_code = row[1]
-                if amount in vouchers:
-                    vouchers[amount].append(voucher_code)
-                else:
-                    vouchers[amount] = [voucher_code]
-    except FileNotFoundError:
-        print("Error: vouchers.csv file not found!")
-    return vouchers
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT amount, voucher_code FROM vouchers")
+        rows = cursor.fetchall()
+
+        for row in rows:
+            amount, voucher_code = row
+            if amount in vouchers:
+                vouchers[amount].append(voucher_code)
+            else:
+                vouchers[amount] = [voucher_code]
+        
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error loading vouchers:", e)
     
-# Save vouchers back to the CSV file
+    return vouchers
+
+# Save vouchers to the database
 def save_vouchers(vouchers):
-    with open("vouchers.csv", mode='w', newline='') as file:
-        csv_writer = csv.writer(file)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Remove existing entries
+        cursor.execute("DELETE FROM vouchers")
+
+        # Insert updated vouchers into the database
         for amount, codes in vouchers.items():
             for code in codes:
-                csv_writer.writerow([amount, code])
+                cursor.execute("INSERT INTO vouchers (amount, voucher_code) VALUES (%s, %s)", (amount, code))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error saving vouchers:", e)
 
 # Print the total count of vouchers per amount
 def print_voucher_totals(vouchers):
@@ -58,33 +95,25 @@ def print_voucher_totals(vouchers):
         print(f"{amount} pesos: {len(codes)}")
     print()
 
-vouchers = load_vouchers()
-print_voucher_totals(vouchers)  # Print initial voucher totals
-
-# Append log entry to logs.json
+# Log voucher use
 def log_voucher_use(amount, voucher_code):
-    log_entry = {
-        "date": datetime.now().strftime("%Y-%m-%d"),
-        "time": datetime.now().strftime("%H:%M:%S"),
-        "amount": amount,
-        "voucher_code": voucher_code
-    }
     try:
-        if os.path.exists("logs.json"):
-            with open("logs.json", mode='r') as file:
-                logs = json.load(file)
-        else:
-            logs = []
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        current_date = datetime.now().strftime("%Y-%m-%d")
+        current_time = datetime.now().strftime("%H:%M:%S")
 
-        logs.append(log_entry)
+        cursor.execute("INSERT INTO logs (date, time, amount, voucher_code) VALUES (%s, %s, %s, %s)", 
+                       (current_date, current_time, amount, voucher_code))
 
-        with open("logs.json", mode='w') as file:
-            json.dump(logs, file, indent=4)
-        print("Log entry added:", log_entry)
-    except FileNotFoundError:
-        print("Error: File not found")
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        print("Log entry added:", {'date': current_date, 'time': current_time, 'amount': amount, 'voucher_code': voucher_code})
+
     except Exception as e:
-        print("Error writing to logs.json:", e)
+        print("Error logging voucher use:", e)
 
 def coin_inserted(channel):
     global last_pulse_time, pulse_count, coin_count
@@ -152,17 +181,25 @@ def voucher_button_click(amount):
     print(f"Amount received: {amount} pesos")
     print(f"Current coin count: {coin_count} pesos")
     
-    if amount in vouchers and vouchers[amount]:
-        voucher_code = vouchers[amount].pop(0)  # Retrieve the voucher code
+    # Fetch available vouchers from the database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT voucher_code FROM vouchers WHERE amount = %s LIMIT 1", (amount,))
+    result = cursor.fetchone()
+
+    if result:
+        voucher_code = result[0]
+        # Log the voucher use
+        log_voucher_use(amount, voucher_code)
+        #cursor.execute("DELETE FROM vouchers WHERE voucher_code = %s", (voucher_code,))
+        conn.commit()
+
         print(f"Dispensing voucher code: {voucher_code}")
         
-        # Save updated vouchers to CSV
-        save_vouchers(vouchers)
         
-        # Log the usage of the voucher
-        log_voucher_use(amount, voucher_code)
         
         # Print updated voucher totals
+        vouchers = load_vouchers()
         print_voucher_totals(vouchers)
         
         # Print voucher code
@@ -170,21 +207,24 @@ def voucher_button_click(amount):
         printer.cut()
 
         # Reset coin count and pulse count
-        coin_count -= amount
+        if amount > 0:
+            coin_count -= amount
+			
         emit('voucher_dispensed', {'voucher_code': voucher_code})
         emit('message', {'status': 'Please get your voucher code'})
 
         if coin_count == 0:
             GPIO.output(ENABLE_PIN, GPIO.LOW)
-            # Reset button states and coin count display
             emit('reset_ui', {'coin_count': coin_count})
         else:
             emit('coin_update', {'coin_count': coin_count}, broadcast=True)
-            # Enable buttons based on the total coin count
             emit('update_buttons', {'coin_count': coin_count})
     else:
         emit('voucher_dispensed', {'voucher_code': 'No vouchers available for this amount'})
         print("No vouchers available for this amount.")
+    
+    cursor.close()
+    conn.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=4000, debug=True)
+    socketio.run(app, host="0.0.0.0", port=4000, debug=True, allow_unsafe_werkzeug=True)

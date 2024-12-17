@@ -1,2 +1,0 @@
-# QBYFI-Kiosk-ViteReact
- 
