@@ -1,0 +1,102 @@
+<!-- /src/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/x-icon" href="/public/Q-Logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="/src/scripts.js"></script>
+    <title>QBYFI Kiosk</title>
+  </head>
+
+  <body>
+    <!-- Intro Welcome Modal -->
+    <div id="introModal" class="intro-modal open">
+      <div class="modal-content">
+        <h1>Welcome to QBYFI Kiosk</h1>
+        <img
+          src="/public/qbyfi_logo.png"
+          alt="QBYFI Logo"
+          style="width: 100%; max-width: 300px"
+        />
+        <p>Click anywhere to start.</p>
+      </div>
+    </div>
+
+    <!-- Main Transaction Body -->
+    <div id="contentWrapper" class="content-wrapper">
+      <div class="content">
+        <div class="logo-container">
+          <img src="/public/qbyfi_logo.png" alt="QBYFI Logo" class="logo" />
+        </div>
+        <h1>Please insert coin on the machine to start</h1>
+        <div>
+          <span>Coins inserted:</span>
+          <div
+            style="
+              display: inline-block;
+              padding: 5px 10px;
+              border: 1px solid black;
+              border-radius: 10px;
+              width: 70px;
+              margin-bottom: 20px;
+              margin-left: 10px;
+            "
+          >
+            <strong id="coin-count">0.00</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center">
+          <button class="package-card dimmed" id="btn-5" disabled>
+            <p>1 hr. 30 mins.</p>
+            <p class="button-price">Php 5.00</p>
+          </button>
+          <button class="package-card dimmed" id="btn-10" disabled>
+            <p>2 hrs.</p>
+            <p class="button-price">Php 10.00</p>
+          </button>
+          <button class="package-card dimmed" id="btn-15" disabled>
+            <p>3 hrs.</p>
+            <p class="button-price">Php 15.00</p>
+          </button>
+          <button class="package-card dimmed" id="btn-20" disabled>
+            <p>4 hrs.</p>
+            <p class="button-price">Php 20.00</p>
+          </button>
+        </div>
+
+        <button class="buy-button dimmed" id="buy-btn" disabled>
+          Buy Package
+        </button>
+      </div>
+    </div>
+
+    <!-- Outro Success Modal -->
+    <div id="successModal" class="outro-modal">
+      <div class="modal-content">
+        <h1>Thank you for your purchase!</h1>
+        <img
+          src="/public/ticket.png"
+          alt="Ticket"
+          style="width: 100%; max-width: 300px"
+        />
+        <p>
+          Don’t forget to claim your ticket stub to start accessing fast
+          internet.
+        </p>
+        <button class="button" onclick="startNewTransaction()">
+          Need another transaction?
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
