@@ -129,7 +129,7 @@ GPIO.output(ENABLE_PIN, GPIO.LOW)
 # Add event detection for coin insertion
 GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
 
-@app.route('/src')
+@app.route('/')
 def index():
     return render_template('index.html')
 
