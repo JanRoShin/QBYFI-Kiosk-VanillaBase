@@ -5,15 +5,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/x-icon" href="/public/Q-Logo.png" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="icon" type="image/x-icon" href="/static/Q-Logo.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="module" src="/scripts.js"></script>
+    <script type="module" src="{{ url_for('static', filename='scripts.js') }}"></script>
     <title>QBYFI Kiosk</title>
   </head>
 
@@ -23,7 +23,7 @@
       <div class="modal-content">
         <h1>Welcome to QBYFI Kiosk</h1>
         <img
-          src="/public/qbyfi_logo.png"
+          src="/static/qbyfi_logo.png"
           alt="QBYFI Logo"
           style="width: 100%; max-width: 300px"
         />
@@ -35,7 +35,7 @@
     <div id="contentWrapper" class="content-wrapper">
       <div class="content">
         <div class="logo-container">
-          <img src="/public/qbyfi_logo.png" alt="QBYFI Logo" class="logo" />
+          <img src="/static/qbyfi_logo.png" alt="QBYFI Logo" class="logo" />
         </div>
         <h1>Please insert coin on the machine to start</h1>
         <div>
@@ -85,7 +85,7 @@
       <div class="modal-content">
         <h1>Thank you for your purchase!</h1>
         <img
-          src="/public/ticket.png"
+          src="/static/ticket.png"
           alt="Ticket"
           style="width: 100%; max-width: 300px"
         />
@@ -93,7 +93,7 @@
           Don’t forget to claim your ticket stub to start accessing fast
           internet.
         </p>
-        <button class="button" onclick="startNewTransaction()">
+        <button class="rebuy-button" onclick="startNewTransaction()">
           Need another transaction?
         </button>
       </div>

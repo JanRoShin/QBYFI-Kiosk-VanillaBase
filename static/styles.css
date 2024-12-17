@@ -47,6 +47,11 @@ body {
   opacity: 1;
 }
 
+.outro-modal.open {
+  visibility: visible;
+  opacity: 1;
+}
+
 .modal-content {
   background: white;
   color: black;
@@ -94,6 +99,7 @@ body {
 
 .package-card.selected {
   background: #c70655;
+  color: white;
   border: 2px solid white;
 }
 
@@ -146,6 +152,18 @@ body {
 }
 .package-card.selected .button-price {
   background: white; /* Button background turns white when selected */
-  color: white; /* Change text color to match the package card background */
+  color: black; /* Change text color to match the package card background */
   box-shadow: none; /* Optional: Remove shadow from button when selected */
+}
+
+.rebuy-button {
+  background: #c70655;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2em;
+  margin: 10px;
 }

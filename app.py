@@ -203,8 +203,8 @@ def voucher_button_click(amount):
         print_voucher_totals(vouchers)
         
         # Print voucher code
-        printer.text(f"Voucher Code: {voucher_code}\n")
-        printer.cut()
+        # printer.text(f"Voucher Code: {voucher_code}\n")
+        # printer.cut()
 
         # Reset coin count and pulse count
         if amount > 0:
