@@ -137,7 +137,7 @@ socket.on("reset_ui", (data) => {
   buyButton.disabled = true;
 
   // Reset selected package
-  // selectedButton = null;
+  selectedButton = null;
 });
 
 socket.on("voucher_dispensed", (data) => {
@@ -148,4 +148,7 @@ socket.on("voucher_dispensed", (data) => {
   const buyButton = document.getElementById("buy-btn");
   buyButton.innerText = "Buy Package";
   buyButton.disabled = true;
+
+  // Reset selected package
+  selectedButton = null;
 });

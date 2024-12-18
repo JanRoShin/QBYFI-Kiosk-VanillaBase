@@ -138,6 +138,11 @@ body {
   opacity: 0;
   pointer-events: none;
 }
+
+.note {
+color: red;
+} 
+
 .button-price {
   display: inline-block; /* Ensures it behaves like a button */
   padding: 10px 20px; /* Space inside the rectangle */
