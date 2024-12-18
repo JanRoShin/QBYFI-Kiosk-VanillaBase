@@ -28,9 +28,9 @@ pulse_count = 0  # To count pulses for determining coin type
 last_pulse_time = time.time()  # Tracks the time of the last pulse
 
 # Database connection settings
-DATABASE_HOST = '192.168.1.2'
-DATABASE_NAME = 'qbyfidb'
-DATABASE_USER = 'qbyfiuser'
+DATABASE_HOST = 'aws-0-ap-southeast-1.pooler.supabase.com'
+DATABASE_NAME = 'postgres'
+DATABASE_USER = 'postgres.mleafifpiappqhuhyucp'
 DATABASE_PASSWORD = 'Alyssa7719!!'
 
 # Establish a connection to the PostgreSQL database
@@ -102,15 +102,16 @@ def log_voucher_use(amount, voucher_code):
         cursor = conn.cursor()
         current_date = datetime.now().strftime("%Y-%m-%d")
         current_time = datetime.now().strftime("%H:%M:%S")
+        kioskName = "Market1"
 
-        cursor.execute("INSERT INTO logs (date, time, amount, voucher_code) VALUES (%s, %s, %s, %s)", 
-                       (current_date, current_time, amount, voucher_code))
+        cursor.execute("INSERT INTO logs (date, time, amount, voucher_code, kiosk_name) VALUES (%s, %s, %s, %s, %s)", 
+                       (current_date, current_time, amount, voucher_code, kioskName))
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        print("Log entry added:", {'date': current_date, 'time': current_time, 'amount': amount, 'voucher_code': voucher_code})
+        print("Log entry added:", {'date': current_date, 'time': current_time, 'amount': amount, 'voucher_code': voucher_code, 'kioskName':kioskName})
 
     except Exception as e:
         print("Error logging voucher use:", e)
@@ -152,6 +153,8 @@ def start_coin_acceptance():
                     coin_value = 5
                 elif pulse_count == 10:
                     coin_value = 10
+                elif pulse_count == 20:
+                    coin_value = 20
                 else:
                     coin_value = 0
 
@@ -165,9 +168,6 @@ def start_coin_acceptance():
                # Enable buttons based on the total coin count
                 emit('update_buttons', {'coin_count': coin_count})
 
-                if coin_count >= 20:
-                    GPIO.output(ENABLE_PIN, GPIO.LOW)
-                    break
             socketio.sleep(0.1)
 
     except KeyboardInterrupt:
@@ -191,7 +191,7 @@ def voucher_button_click(amount):
         voucher_code = result[0]
         # Log the voucher use
         log_voucher_use(amount, voucher_code)
-        #cursor.execute("DELETE FROM vouchers WHERE voucher_code = %s", (voucher_code,))
+        cursor.execute("DELETE FROM vouchers WHERE voucher_code = %s", (voucher_code,))
         conn.commit()
 
         print(f"Dispensing voucher code: {voucher_code}")
@@ -203,14 +203,14 @@ def voucher_button_click(amount):
         print_voucher_totals(vouchers)
         
         # Print voucher code
-        # printer.text(f"Voucher Code: {voucher_code}\n")
-        # printer.cut()
+        printer.text(f"Voucher Code: {voucher_code}\n")
+        printer.cut()
 
         # Reset coin count and pulse count
         if amount > 0:
             coin_count -= amount
 			
-        emit('voucher_dispensed', {'voucher_code': voucher_code})
+        emit('voucher_dispensed', {'coin_count': coin_count})
         emit('message', {'status': 'Please get your voucher code'})
 
         if coin_count == 0:
@@ -227,4 +227,4 @@ def voucher_button_click(amount):
     conn.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=4000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)

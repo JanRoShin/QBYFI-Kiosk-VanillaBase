@@ -20,9 +20,7 @@ document.getElementById("introModal").addEventListener("click", function () {
   socket.emit("start_coin_acceptance");
 });
 
-document.getElementById("successModal").addEventListener("click", function () {
-  startNewTransaction();
-});
+
 
 // Track the selected package card
 let selectedButton = null;
@@ -37,14 +35,6 @@ document.getElementById("btn-5").addEventListener("click", () => {
   document.getElementById("btn-5").classList.add("selected");
 });
 
-document.getElementById("btn-10").addEventListener("click", () => {
-  selectedButton = 10; // Store the selected button ID
-  document.querySelectorAll(".package-card").forEach((card) => {
-    card.classList.remove("selected");
-  });
-  document.getElementById("btn-10").classList.add("selected");
-});
-
 document.getElementById("btn-15").addEventListener("click", () => {
   selectedButton = 15; // Store the selected button ID
   document.querySelectorAll(".package-card").forEach((card) => {
@@ -53,12 +43,12 @@ document.getElementById("btn-15").addEventListener("click", () => {
   document.getElementById("btn-15").classList.add("selected");
 });
 
-document.getElementById("btn-20").addEventListener("click", () => {
-  selectedButton = 20; // Store the selected button ID
+document.getElementById("btn-30").addEventListener("click", () => {
+  selectedButton = 30; // Store the selected button ID
   document.querySelectorAll(".package-card").forEach((card) => {
     card.classList.remove("selected");
   });
-  document.getElementById("btn-20").classList.add("selected");
+  document.getElementById("btn-30").classList.add("selected");
 });
 
 // Handle the "buy" button click
@@ -91,17 +81,15 @@ socket.on("update_buttons", (data) => {
   document.getElementById("buy-btn").disabled = coinCount < 5;
 
   document.getElementById("btn-5").disabled = coinCount < 5;
-  document.getElementById("btn-10").disabled = coinCount < 10;
   document.getElementById("btn-15").disabled = coinCount < 15;
-  document.getElementById("btn-20").disabled = coinCount < 20;
+  document.getElementById("btn-30").disabled = coinCount < 30;
 
   // Array of button configurations
   const buttons = [
     { id: "btn-5", cost: 5 },
     { id: "buy-btn", cost: 5 },
-    { id: "btn-10", cost: 10 },
     { id: "btn-15", cost: 15 },
-    { id: "btn-20", cost: 20 },
+    { id: "btn-30", cost: 30 }
   ];
 
   // Iterate through buttons to enable/disable and update class
@@ -122,7 +110,7 @@ socket.on("reset_ui", (data) => {
   document.getElementById("coin-count").innerText = `${data.coin_count}.00`;
 
   // Array of button configurations
-  const buttons = ["btn-5", "btn-10", "btn-15", "btn-20", "buy-btn"];
+  const buttons = ["btn-5", "btn-15", "btn-30", "buy-btn"];
 
   // Reset button states and apply 'dimmed' class
   buttons.forEach((buttonId) => {
@@ -137,15 +125,33 @@ socket.on("reset_ui", (data) => {
   buyButton.disabled = true;
 
   // Reset selected package
-  // selectedButton = null;
+  selectedButton = null;
 });
 
 socket.on("voucher_dispensed", (data) => {
-  // Open the success modal
-  openModal("successModal");
+	
+	// Open the success modal
+	  openModal("successModal");
 
+  const coinCount = data.coin_count;
+  
+  
+  document.getElementById("successModal").addEventListener("click", function () {
+	 if (coinCount ==0) {
+	  startNewTransaction();
+   } else {
+	   closeModal("successModal");
+	   socket.emit("start_coin_acceptance");
+   }
+ 
+  
+});
+  
   // Reset the buy button state
   const buyButton = document.getElementById("buy-btn");
   buyButton.innerText = "Buy Package";
   buyButton.disabled = true;
+
+  // Reset selected package
+  selectedButton = null;
 });
