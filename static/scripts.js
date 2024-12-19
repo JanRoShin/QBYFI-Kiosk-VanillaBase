@@ -24,10 +24,12 @@ document.getElementById("introModal").addEventListener("click", function () {
 
 // Track the selected package card
 let selectedButton = null;
+let voucherDuration = null;
 
 // Add event listeners to the package buttons
 document.getElementById("btn-5").addEventListener("click", () => {
   selectedButton = 5; // Store the selected button ID
+  voucherDuration = "1 hour 30 mins"
   // Optional: You can add some visual indication of selection
   document.querySelectorAll(".package-card").forEach((card) => {
     card.classList.remove("selected");
@@ -37,6 +39,7 @@ document.getElementById("btn-5").addEventListener("click", () => {
 
 document.getElementById("btn-15").addEventListener("click", () => {
   selectedButton = 15; // Store the selected button ID
+  voucherDuration = "5 hours"
   document.querySelectorAll(".package-card").forEach((card) => {
     card.classList.remove("selected");
   });
@@ -45,6 +48,7 @@ document.getElementById("btn-15").addEventListener("click", () => {
 
 document.getElementById("btn-30").addEventListener("click", () => {
   selectedButton = 30; // Store the selected button ID
+  voucherDuration = "12 hours"
   document.querySelectorAll(".package-card").forEach((card) => {
     card.classList.remove("selected");
   });
@@ -61,7 +65,7 @@ document.getElementById("buy-btn").addEventListener("click", () => {
     buyButton.disabled = true;
 
     // Emit the selected voucher click event
-    socket.emit("voucher_button_click", selectedButton);
+    socket.emit("voucher_button_click", selectedButton, voucherDuration);
   } else {
     alert("Please select a voucher first.");
   }

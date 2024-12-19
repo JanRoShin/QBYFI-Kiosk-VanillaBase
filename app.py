@@ -176,7 +176,7 @@ def start_coin_acceptance():
     return jsonify({'message': 'Coin acceptance completed', 'coin_count': coin_count})
 
 @socketio.on('voucher_button_click')
-def voucher_button_click(amount):
+def voucher_button_click(amount, duration):
     global coin_count
     print(f"Amount received: {amount} pesos")
     print(f"Current coin count: {coin_count} pesos")
@@ -203,8 +203,15 @@ def voucher_button_click(amount):
         print_voucher_totals(vouchers)
         
         # Print voucher code
-        printer.text(f"Voucher Code: {voucher_code}\n")
-        printer.cut()
+        printer.set_with_default()
+        printer.set(double_width=True)
+        printer.text(f"Amount: Php {amount}.00\n")
+        printer.text(f"Duration: {duration}\n")
+        printer.text(f"Voucher Code:\n")
+        printer.ln()
+        printer.set(double_width=True, double_height=True, align='center', bold=True)
+        printer.text(voucher_code)
+        printer.cut(mode='PART')
 
         # Reset coin count and pulse count
         if amount > 0:
