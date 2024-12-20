@@ -212,6 +212,8 @@ def voucher_button_click(amount, duration):
         printer.set(double_width=True, double_height=True, align='center', bold=True)
         printer.text(voucher_code)
         printer.cut(mode='PART')
+        printer.text(f"Voucher Code: {voucher_code}\n")
+        printer.cut()
 
         # Reset coin count and pulse count
         if amount > 0:
