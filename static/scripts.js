@@ -1,6 +1,7 @@
 // /src/script.js
 
 const socket = io();
+// let transactionActive = false;
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("open");
@@ -13,10 +14,15 @@ function openModal(modalId) {
 function startNewTransaction() {
   closeModal("successModal");
   openModal("introModal");
+  // transactionActive = false;
 }
 
 document.getElementById("introModal").addEventListener("click", function () {
   closeModal("introModal");
+  //if(!transactionActive) {
+	//transactionActive = true; 
+	//socket.emit("start_coin_acceptance");
+  //}
   socket.emit("start_coin_acceptance");
 });
 
@@ -145,7 +151,6 @@ socket.on("voucher_dispensed", (data) => {
 	  startNewTransaction();
    } else {
 	   closeModal("successModal");
-	   socket.emit("start_coin_acceptance");
    }
  
   
