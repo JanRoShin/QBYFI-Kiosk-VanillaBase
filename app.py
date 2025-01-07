@@ -151,10 +151,13 @@ def start_coin_acceptance():
                     print("1 peso inserted")
                 elif pulse_count == 5:
                     coin_value = 5
+                    print("5 peso inserted")
                 elif pulse_count == 10:
                     coin_value = 10
+                    print("10 peso inserted")
                 elif pulse_count == 20:
                     coin_value = 20
+                    print("20 peso inserted")
                 else:
                     coin_value = 0
 
