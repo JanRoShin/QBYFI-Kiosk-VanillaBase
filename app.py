@@ -136,6 +136,9 @@ GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
+# Add event detection for coin insertion
+GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -146,7 +149,7 @@ def start_coin_acceptance():
     
     # Remove existing event detection if it exists
     try:
-        GPIO.remove_event_detect(COIN_SENSOR_PIN)
+        GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
     except:
         pass
         
