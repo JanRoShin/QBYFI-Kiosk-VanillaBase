@@ -8,6 +8,15 @@ import json
 import os
 from datetime import datetime 
 import psycopg2
+import atexit
+
+@atexit.register
+def cleanup():
+    try:
+        GPIO.remove_event_detect(COIN_SENSOR_PIN)
+        GPIO.cleanup()
+    except:
+        pass
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -137,6 +146,16 @@ def index():
 @socketio.on('start_coin_acceptance')
 def start_coin_acceptance():
     global pulse_count, coin_count, last_pulse_time
+    
+    # Remove existing event detection if it exists
+    try:
+        GPIO.remove_event_detect(COIN_SENSOR_PIN)
+    except:
+        pass
+        
+    # Add new event detection
+    GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+    
 
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
     print("Waiting for coins to be inserted...")
@@ -237,4 +256,7 @@ def voucher_button_click(amount, duration):
     conn.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
+    try:
+        socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
+    finally:
+        cleanup()  # Add this line
