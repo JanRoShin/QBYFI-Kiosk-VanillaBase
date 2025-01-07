@@ -149,7 +149,7 @@ def start_coin_acceptance():
     
     # Remove existing event detection if it exists
     try:
-        GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+        GPIO.remove_event_detect(COIN_SENSOR_PIN)
     except:
         pass
         
