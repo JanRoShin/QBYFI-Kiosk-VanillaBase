@@ -136,6 +136,13 @@ GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
+
+# Remove existing event detection if it exists
+try:
+    GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+except:
+    pass
+
 # Add event detection for coin insertion
 GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
 
@@ -146,16 +153,6 @@ def index():
 @socketio.on('start_coin_acceptance')
 def start_coin_acceptance():
     global pulse_count, coin_count, last_pulse_time
-    
-    # Remove existing event detection if it exists
-    try:
-        GPIO.remove_event_detect(COIN_SENSOR_PIN)
-    except:
-        pass
-        
-    # Add new event detection
-    GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-    
 
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
     print("Waiting for coins to be inserted...")
