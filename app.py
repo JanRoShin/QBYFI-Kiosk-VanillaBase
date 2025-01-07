@@ -125,7 +125,7 @@ def log_voucher_use(amount, voucher_code):
     except Exception as e:
         print("Error logging voucher use:", e)
 
-def coin_inserted(channel):
+def coin_inserted():
     global last_pulse_time, pulse_count, coin_count
     current_time = time.time()
     pulse_count += 1
@@ -135,9 +135,6 @@ def coin_inserted(channel):
 GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
-
-# Add event detection for coin insertion
-GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
 
 @app.route('/')
 def index():
