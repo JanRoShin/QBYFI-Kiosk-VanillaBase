@@ -125,7 +125,7 @@ def log_voucher_use(amount, voucher_code):
     except Exception as e:
         print("Error logging voucher use:", e)
 
-def coin_inserted():
+def coin_inserted(channel):
     global last_pulse_time, pulse_count, coin_count
     current_time = time.time()
     pulse_count += 1
@@ -221,19 +221,19 @@ def voucher_button_click(amount, duration):
         
         
         # Print updated voucher totals
-        vouchers = load_vouchers()
-        print_voucher_totals(vouchers)
+        #vouchers = load_vouchers()
+        #print_voucher_totals(vouchers)
         
         # Print voucher code
-        printer.set_with_default()
-        printer.set(double_width=True)
-        printer.text(f"Amount: Php {amount}.00\n")
-        printer.text(f"Duration: {duration}\n")
-        printer.text(f"Voucher Code:\n")
-        printer.ln()
-        printer.set(double_width=True, double_height=True, align='center', bold=True)
-        printer.text(voucher_code)
-        printer.cut(mode='PART')
+        #printer.set_with_default()
+        #printer.set(double_width=True)
+        #printer.text(f"Amount: Php {amount}.00\n")
+        #printer.text(f"Duration: {duration}\n")
+        #printer.text(f"Voucher Code:\n")
+        #printer.ln()
+        #printer.set(double_width=True, double_height=True, align='center', bold=True)
+        #printer.text(voucher_code)
+        #printer.cut(mode='PART')
 
         # Reset coin count and pulse count
         if amount > 0:
@@ -257,6 +257,6 @@ def voucher_button_click(amount, duration):
 
 if __name__ == '__main__':
     try:
-        socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)
+        socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
     finally:
         cleanup()  # Add this line
