@@ -138,11 +138,11 @@ GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
 
-# Remove existing event detection if it exists
-try:
-    GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-except:
-    pass
+# # Remove existing event detection if it exists
+# try:
+#     GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+# except:
+#     pass
 
 # Add event detection for coin insertion
 GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
