@@ -8,6 +8,15 @@ import json
 import os
 from datetime import datetime 
 import psycopg2
+import atexit
+
+@atexit.register
+def cleanup():
+    try:
+        GPIO.remove_event_detect(COIN_SENSOR_PIN)
+        GPIO.cleanup()
+    except:
+        pass
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -128,9 +137,6 @@ GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
-# Add event detection for coin insertion
-GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -141,6 +147,18 @@ def start_coin_acceptance():
 
     # Reset the purchase flag at the start of new transaction
     purchase_complete = False
+
+    
+    # Remove existing event detection if it exists
+    try:
+        GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+    except:
+        pass
+
+    # Add event detection for coin insertion
+    GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+
+
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
     print("Waiting for coins to be inserted...")
     emit('message', {'status': 'Coin acceptance started'})
@@ -179,6 +197,9 @@ def start_coin_acceptance():
 
     except KeyboardInterrupt:
         GPIO.cleanup()
+    finally:
+        # Make sure to lower the enable pin
+        GPIO.output(ENABLE_PIN, GPIO.LOW)
 
     return jsonify({'message': 'Coin acceptance completed', 'coin_count': coin_count})
 
@@ -208,8 +229,8 @@ def voucher_button_click(amount, duration):
         # Print updated voucher totals
         #vouchers = load_vouchers()
         #print_voucher_totals(vouchers)
-        #
-        ## Print voucher code
+        
+        # Print voucher code
         #printer.set_with_default()
         #printer.set(double_width=True)
         #printer.text(f"Amount: Php {amount}.00\n")
@@ -243,4 +264,7 @@ def voucher_button_click(amount, duration):
     conn.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
+    try:
+        socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
+    finally:
+        cleanup()  # Add this lineug=True)
