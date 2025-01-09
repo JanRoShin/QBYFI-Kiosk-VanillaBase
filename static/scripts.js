@@ -2,7 +2,6 @@
 
 const socket = io();
 let transactionActive = false;
-const coinCount = data.coin_count;
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("open");
@@ -13,13 +12,9 @@ function openModal(modalId) {
 }
 
 function startNewTransaction() {
-  if (coinCount === 0) {
-    closeModal("successModal");
-    openModal("introModal");
-    transactionActive = false;
-  } else {
-    closeModal("successModal");
-  }
+  closeModal("successModal");
+  openModal("introModal");
+  transactionActive = false;
 }
 
 document.getElementById("introModal").addEventListener("click", function () {
