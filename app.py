@@ -255,8 +255,6 @@ def voucher_button_click(amount, duration):
         else:
             emit('coin_update', {'coin_count': coin_count}, broadcast=True)
             emit('update_buttons', {'coin_count': coin_count})
-            # Set the purchase complete flag to break the coin acceptance loop
-            #purchase_complete = True
     else:
         emit('voucher_dispensed', {'voucher_code': 'No vouchers available for this amount'})
         print("No vouchers available for this amount.")
