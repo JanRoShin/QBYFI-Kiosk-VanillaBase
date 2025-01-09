@@ -141,13 +141,32 @@ socket.on("voucher_dispensed", (data) => {
 
   const coinCount = data.coin_count;
 
-  document.getElementById("rebuy").addEventListener("click", function () {
+  // Store the timeout ID
+  let modalTimeout = setTimeout(() => {
+    if (document.getElementById("successModal").classList.contains("open")) {
+      startNewTransaction();
+    }
+  }, 10000);
+
+  // Create the click handler function
+  const handleRebuyClick = function () {
+    // Clear the timeout when user clicks manually
+    clearTimeout(modalTimeout);
+
     if (coinCount === 0) {
       startNewTransaction();
     } else {
       closeModal("successModal");
     }
-  });
+
+    // Remove the event listener after it's used
+    document
+      .getElementById("rebuy")
+      .removeEventListener("click", handleRebuyClick);
+  };
+
+  // Add the click event listener
+  document.getElementById("rebuy").addEventListener("click", handleRebuyClick);
 
   // Reset the buy button state
   const buyButton = document.getElementById("buy-btn");
