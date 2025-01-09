@@ -144,7 +144,11 @@ socket.on("voucher_dispensed", (data) => {
   // Store the timeout ID
   let modalTimeout = setTimeout(() => {
     if (document.getElementById("successModal").classList.contains("open")) {
-      startNewTransaction();
+      if (coinCount === 0) {
+        startNewTransaction();
+      } else {
+        closeModal("successModal");
+      }
     }
   }, 10000);
 
