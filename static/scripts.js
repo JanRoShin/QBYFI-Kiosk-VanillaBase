@@ -149,6 +149,7 @@ socket.on("voucher_dispensed", (data) => {
         startNewTransaction();
       } else {
         closeModal("successModal");
+        socket.emit("start_coin_acceptance");
       }
     });
 
