@@ -139,6 +139,16 @@ socket.on("voucher_dispensed", (data) => {
   // Open the success modal
   openModal("successModal");
 
+  const coinCount = data.coin_count;
+
+  document.getElementById("rebuy").addEventListener("click", function () {
+    if (coinCount === 0) {
+      startNewTransaction();
+    } else {
+      closeModal("successModal");
+    }
+  });
+
   // Reset the buy button state
   const buyButton = document.getElementById("buy-btn");
   buyButton.innerText = "Buy Package";
