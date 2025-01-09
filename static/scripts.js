@@ -1,7 +1,7 @@
 // /src/script.js
 
 const socket = io();
-let transactionActive = false;
+// let transactionActive = false;
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("open");
@@ -14,15 +14,16 @@ function openModal(modalId) {
 function startNewTransaction() {
   closeModal("successModal");
   openModal("introModal");
-  transactionActive = false;
+  // transactionActive = false;
 }
 
 document.getElementById("introModal").addEventListener("click", function () {
   closeModal("introModal");
-  if (!transactionActive) {
-    transactionActive = true;
-    socket.emit("start_coin_acceptance");
-  }
+  // if (!transactionActive) {
+  //   transactionActive = true;
+  //   socket.emit("start_coin_acceptance");
+  // }
+  socket.emit("start_coin_acceptance");
 });
 
 // Track the selected package card
