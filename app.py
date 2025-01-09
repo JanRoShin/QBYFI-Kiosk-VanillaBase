@@ -137,6 +137,16 @@ GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
+
+# Remove existing event detection if it exists
+try:
+    GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+except:
+    pass
+
+# Add event detection for coin insertion
+GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -147,17 +157,6 @@ def start_coin_acceptance():
 
     # Reset the purchase flag at the start of new transaction
     purchase_complete = False
-
-    
-    # Remove existing event detection if it exists
-    try:
-        GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-    except:
-        pass
-
-    # Add event detection for coin insertion
-    GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-
 
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
     print("Waiting for coins to be inserted...")
@@ -197,9 +196,6 @@ def start_coin_acceptance():
 
     except KeyboardInterrupt:
         GPIO.cleanup()
-    finally:
-        # Make sure to lower the enable pin
-        GPIO.output(ENABLE_PIN, GPIO.LOW)
 
     return jsonify({'message': 'Coin acceptance completed', 'coin_count': coin_count})
 
@@ -268,3 +264,6 @@ if __name__ == '__main__':
         socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
     finally:
         cleanup()  # Add this lineug=True)
+        socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
+    finally:
+        cleanup()  # Add this line
