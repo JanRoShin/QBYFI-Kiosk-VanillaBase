@@ -12,9 +12,13 @@ function openModal(modalId) {
 }
 
 function startNewTransaction() {
-  closeModal("successModal");
-  openModal("introModal");
-  transactionActive = false;
+  if (coinCount === 0) {
+    closeModal("successModal");
+    openModal("introModal");
+    transactionActive = false;
+  } else {
+    closeModal("successModal");
+  }
 }
 
 document.getElementById("introModal").addEventListener("click", function () {
@@ -144,11 +148,7 @@ socket.on("voucher_dispensed", (data) => {
   document
     .getElementById("successModal")
     .addEventListener("click", function () {
-      if (coinCount === 0) {
-        startNewTransaction();
-      } else {
-        closeModal("successModal");
-      }
+      startNewTransaction();
     });
 
   // Reset the buy button state
