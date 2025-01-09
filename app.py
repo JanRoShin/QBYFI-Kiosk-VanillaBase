@@ -35,6 +35,7 @@ ENABLE_PIN = 7
 coin_count = 0  # Total value of coins inserted
 pulse_count = 0  # To count pulses for determining coin type
 last_pulse_time = time.time()  # Tracks the time of the last pulse
+purchase_complete = False
 
 # Database connection settings
 DATABASE_HOST = 'aws-0-ap-southeast-1.pooler.supabase.com'
@@ -152,14 +153,18 @@ def index():
 
 @socketio.on('start_coin_acceptance')
 def start_coin_acceptance():
-    global pulse_count, coin_count, last_pulse_time
+    global pulse_count, coin_count, last_pulse_time, purchase_complete
+
+    # Reset the purchase flag at the start of new transaction
+    purchase_complete = False
 
     GPIO.output(ENABLE_PIN, GPIO.HIGH)
     print("Waiting for coins to be inserted...")
     emit('message', {'status': 'Coin acceptance started'})
 
     try:
-        while True:
+       # Instead of while True, we use a condition that checks purchase_complete
+        while not purchase_complete:  # This is more explicit than while True + break
             current_time = time.time()
             if pulse_count > 0 and current_time - last_pulse_time > 0.5:
                 if pulse_count == 1:
@@ -191,12 +196,15 @@ def start_coin_acceptance():
 
     except KeyboardInterrupt:
         GPIO.cleanup()
+    finally:
+        # Make sure to lower the enable pin
+        GPIO.output(ENABLE_PIN, GPIO.LOW)
 
     return jsonify({'message': 'Coin acceptance completed', 'coin_count': coin_count})
 
 @socketio.on('voucher_button_click')
 def voucher_button_click(amount, duration):
-    global coin_count
+    global coin_count, purchase_complete
     print(f"Amount received: {amount} pesos")
     print(f"Current coin count: {coin_count} pesos")
     
@@ -242,9 +250,13 @@ def voucher_button_click(amount, duration):
         if coin_count == 0:
             GPIO.output(ENABLE_PIN, GPIO.LOW)
             emit('reset_ui', {'coin_count': coin_count})
+            # Set the purchase complete flag to break the coin acceptance loop
+            purchase_complete = True
         else:
             emit('coin_update', {'coin_count': coin_count}, broadcast=True)
             emit('update_buttons', {'coin_count': coin_count})
+            # Set the purchase complete flag to break the coin acceptance loop
+            #purchase_complete = True
     else:
         emit('voucher_dispensed', {'voucher_code': 'No vouchers available for this amount'})
         print("No vouchers available for this amount.")
