@@ -2,6 +2,7 @@
 
 const socket = io();
 let transactionActive = false;
+const coinCount = data.coin_count;
 
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("open");
@@ -142,14 +143,6 @@ socket.on("reset_ui", (data) => {
 socket.on("voucher_dispensed", (data) => {
   // Open the success modal
   openModal("successModal");
-
-  const coinCount = data.coin_count;
-
-  document
-    .getElementById("successModal")
-    .addEventListener("click", function () {
-      startNewTransaction();
-    });
 
   // Reset the buy button state
   const buyButton = document.getElementById("buy-btn");
