@@ -23,7 +23,7 @@ document.getElementById("introModal").addEventListener("click", function () {
     transactionActive = true;
     socket.emit("start_coin_acceptance");
   }
-  socket.emit("start_coin_acceptance");
+  // socket.emit("start_coin_acceptance");
 });
 
 // Track the selected package card
