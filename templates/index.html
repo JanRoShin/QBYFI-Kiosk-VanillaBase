@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Just the essential styles and scripts -->
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script
+      type="module"
+      src="{{ url_for('static', filename='scripts.js') }}"
+    ></script>
     <title>Simple QBYFI Kiosk</title>
     <style>
       /* Essential styles for functionality */
@@ -103,7 +107,5 @@
         <button onclick="startNewTransaction()">New Transaction</button>
       </div>
     </div>
-
-    <script src="scripts.js"></script>
   </body>
 </html>
