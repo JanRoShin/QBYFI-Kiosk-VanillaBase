@@ -23,7 +23,6 @@ document.getElementById("introModal").addEventListener("click", function () {
     transactionActive = true;
     socket.emit("start_coin_acceptance");
   }
-  // socket.emit("start_coin_acceptance");
 });
 
 // Track the selected package card
@@ -145,7 +144,7 @@ socket.on("voucher_dispensed", (data) => {
   document
     .getElementById("successModal")
     .addEventListener("click", function () {
-      if (coinCount == 0) {
+      if (coinCount === 0) {
         startNewTransaction();
       } else {
         closeModal("successModal");
