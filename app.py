@@ -3,20 +3,8 @@ from flask_socketio import SocketIO, emit
 from escpos.printer import Usb
 import OPi.GPIO as GPIO
 import time
-import csv
-import json
-import os
 from datetime import datetime 
 import psycopg2
-import atexit
-
-@atexit.register
-def cleanup():
-    try:
-        GPIO.remove_event_detect(COIN_SENSOR_PIN)
-        GPIO.cleanup()
-    except:
-        pass
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -260,7 +248,4 @@ def voucher_button_click(amount, duration):
     conn.close()
 
 if __name__ == '__main__':
-    try:
-        socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
-    finally:
-        cleanup()  # Add this line
+    socketio.run(app, host="0.0.0.0", port=5002, debug=True, allow_unsafe_werkzeug=True)
