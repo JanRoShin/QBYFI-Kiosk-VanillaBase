@@ -3,6 +3,9 @@
 const socket = io();
 let transactionActive = false;
 
+// Initialize system in inactive state
+socket.emit("deactivate_system");
+
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove("open");
 }
@@ -15,15 +18,17 @@ function startNewTransaction() {
   closeModal("successModal");
   openModal("introModal");
   transactionActive = false;
+  socket.emit("deactivate_system"); // Ensure system is deactivated when returning to intro
 }
 
 document.getElementById("introModal").addEventListener("click", function () {
   closeModal("introModal");
   if (!transactionActive) {
     transactionActive = true;
+    socket.emit("activate_system"); // Activate system only after intro modal is closed
     socket.emit("start_coin_acceptance");
+    console.log("Transaction started - Coin system activated");
   }
-  // socket.emit("start_coin_acceptance");
 });
 
 // Track the selected package card
@@ -146,6 +151,8 @@ socket.on("voucher_dispensed", (data) => {
   let modalTimeout = setTimeout(() => {
     if (document.getElementById("successModal").classList.contains("open")) {
       if (coinCount === 0) {
+        socket.emit("deactivate_system"); // Deactivate system when transaction is complete
+        console.log("Transaction complete - Coin system deactivated");
         startNewTransaction();
       } else {
         closeModal("successModal");
@@ -159,6 +166,8 @@ socket.on("voucher_dispensed", (data) => {
     clearTimeout(modalTimeout);
 
     if (coinCount === 0) {
+      socket.emit("deactivate_system"); // Deactivate system when transaction is complete
+      console.log("Transaction complete - Coin system deactivated");
       startNewTransaction();
     } else {
       closeModal("successModal");
@@ -169,6 +178,12 @@ socket.on("voucher_dispensed", (data) => {
       .getElementById("rebuy")
       .removeEventListener("click", handleRebuyClick);
   };
+
+  // If no remaining balance, deactivate system
+  if (coinCount === 0) {
+    socket.emit("deactivate_system");
+    console.log("Transaction complete - Coin system deactivated");
+  }
 
   // Add the click event listener
   document.getElementById("rebuy").addEventListener("click", handleRebuyClick);
