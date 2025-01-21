@@ -125,13 +125,6 @@ GPIO.setup(COIN_SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(ENABLE_PIN, GPIO.OUT)
 GPIO.output(ENABLE_PIN, GPIO.LOW)
 
-
-# Remove existing event detection if it exists
-try:
-    GPIO.remove_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
-except:
-    pass
-
 # Add event detection for coin insertion
 GPIO.add_event_detect(COIN_SENSOR_PIN, GPIO.RISING, callback=coin_inserted, bouncetime=50)
 
@@ -211,19 +204,19 @@ def voucher_button_click(amount, duration):
         
         
         # Print updated voucher totals
-        #vouchers = load_vouchers()
-        #print_voucher_totals(vouchers)
+        vouchers = load_vouchers()
+        print_voucher_totals(vouchers)
         
         # Print voucher code
-        #printer.set_with_default()
-        #printer.set(double_width=True)
-        #printer.text(f"Amount: Php {amount}.00\n")
-        #printer.text(f"Duration: {duration}\n")
-        #printer.text(f"Voucher Code:\n")
-        #printer.ln()
-        #printer.set(double_width=True, double_height=True, align='center', bold=True)
-        #printer.text(voucher_code)
-        #printer.cut(mode='PART')
+        printer.set_with_default()
+        printer.set(double_width=True)
+        printer.text(f"Amount: Php {amount}.00\n")
+        printer.text(f"Duration: {duration}\n")
+        printer.text(f"Voucher Code:\n")
+        printer.ln()
+        printer.set(double_width=True, double_height=True, align='center', bold=True)
+        printer.text(voucher_code)
+        printer.cut(mode='PART')
 
         # Reset coin count and pulse count
         if amount > 0:
@@ -248,4 +241,4 @@ def voucher_button_click(amount, duration):
     conn.close()
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host="0.0.0.0", port=5001, debug=True, allow_unsafe_werkzeug=True)

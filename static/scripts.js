@@ -19,11 +19,11 @@ function startNewTransaction() {
 
 document.getElementById("introModal").addEventListener("click", function () {
   closeModal("introModal");
-	if (!transactionActive) {
-		transactionActive = true;
-		socket.emit("start_coin_acceptance");
+  if (!transactionActive) {
+    transactionActive = true;
+    socket.emit("start_coin_acceptance");
   }
- // socket.emit("start_coin_acceptance");
+  // socket.emit("start_coin_acceptance");
 });
 
 // Track the selected package card
